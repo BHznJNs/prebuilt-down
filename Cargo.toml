@@ -1,0 +1,15 @@
+[package]
+name = "prebuilt-down"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+flate2 = "1"
+reqwest = { version = "0.13", default-features = false, features = ["blocking", "rustls"] }
+serde = { version = "1", features = ["derive"] }
+sha2 = "0.10"
+tar = "0.4"
+toml = "0.8"
+zip = "2"
