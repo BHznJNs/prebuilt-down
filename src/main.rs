@@ -8,6 +8,7 @@ use clap::Parser;
 use std::path::PathBuf;
 
 use crate::cli::Cli;
+use crate::core::extract::ExtractArchive;
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
@@ -20,7 +21,16 @@ fn main() -> Result<()> {
     let download_dir = core::http::init_download_dir(None)?;
     for config in configs {
         let platform_config = &config.inner.platforms[&platform];
-        core::http::download_to(&platform_config.url, &download_dir.join(config.name))?;
+        let download_path = download_dir.join(&config.name);
+        core::http::download_to(&platform_config.url, &download_path)?;
+        if let Some(archive_type) = platform_config.archive {
+            archive_type.extract(&download_path, &config.inner.target)?;
+        } else {
+            eprintln!(
+                "Warning: archive type not specified for {}, skipping extraction",
+                config.name
+            );
+        }
     }
 
     return Ok(());

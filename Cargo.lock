@@ -1045,6 +1045,7 @@ dependencies = [
  "sha2",
  "tar",
  "toml",
+ "xz2",
  "zip",
 ]
 
