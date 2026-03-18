@@ -6,7 +6,7 @@ use std::io::copy;
 use std::path::{Path, PathBuf};
 
 const REDIRECT_LIMIT: usize = 10;
-const DEFAULT_DOWNLOAD_DIR: &str = ".prebuilt_down";
+const DEFAULT_DOWNLOAD_DIR: &str = ".prebuilt-down";
 
 fn build_client() -> Result<Client> {
     let client = Client::builder()

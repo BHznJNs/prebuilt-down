@@ -1,1 +1,6 @@
 /target
+
+bin/
+.prebuilt_down/
+
+*.test.toml

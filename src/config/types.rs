@@ -29,7 +29,7 @@ pub enum ArchiveType {
 #[derive(Debug, Deserialize)]
 pub struct PlatformEntry {
     pub url: String,
-    pub root: String,
+    pub root: PathBuf,
     #[serde(default)]
     pub hash: Option<HashConfig>,
     #[serde(default)]

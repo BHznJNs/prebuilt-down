@@ -37,10 +37,10 @@ target = "bin/node/" # extracted path
 url = "https://nodejs.org/dist/v25.8.1/node-v25.8.1-win-x64.zip"
 root = "node-v25.8.1-win-x64/"
 archive = "zip"
-hash = {
-    algorithm = "sha256",
-    digest = "bb1518746cab560370fb402c3fe17ddd527141a2a341043d5e7db5d39b98d4be"
-}
+
+[node.windows-x64.hash]
+algorithm = "sha256"
+digest = "bb1518746cab560370fb402c3fe17ddd527141a2a341043d5e7db5d39b98d4be"
 
 [node.linux-x64]
 url = "https://nodejs.org/dist/v25.8.1/node-v25.8.1-linux-x64.tar.xz"
