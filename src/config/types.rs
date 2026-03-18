@@ -1,5 +1,6 @@
 use serde::Deserialize;
 use std::collections::HashMap;
+use std::path::PathBuf;
 
 use crate::platform::Platform;
 
@@ -37,9 +38,15 @@ pub struct PlatformEntry {
 
 #[derive(Debug, Deserialize)]
 pub struct PrebuiltConfig {
-    pub target: String,
+    pub target: PathBuf,
     #[serde(flatten)]
     pub platforms: HashMap<Platform, PlatformEntry>,
 }
 
-pub type Config = HashMap<String, PrebuiltConfig>;
+pub type ConfigMap = HashMap<String, PrebuiltConfig>;
+
+#[derive(Debug)]
+pub struct Config {
+    pub name: String,
+    pub inner: PrebuiltConfig,
+}

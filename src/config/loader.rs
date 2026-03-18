@@ -2,12 +2,16 @@ use anyhow::{Context, Result};
 use std::fs;
 use std::path::Path;
 
-use super::types::Config;
+use super::types::{Config, ConfigMap};
 
-pub fn load_config(path: &Path) -> Result<Config> {
+pub fn load_configs(path: &Path) -> Result<Vec<Config>> {
     let content = fs::read_to_string(path)
         .with_context(|| format!("failed to read config file: {}", path.display()))?;
-    let config = toml::from_str(&content)
+    let config_map: ConfigMap = toml::from_str(&content)
         .with_context(|| format!("failed to parse config toml: {}", path.display()))?;
-    return Ok(config);
+    let configs: Vec<Config> = config_map
+        .into_iter()
+        .map(|(name, p)| Config { name, inner: p })
+        .collect();
+    return Ok(configs);
 }
