@@ -3,9 +3,10 @@ use reqwest::blocking::Client;
 use reqwest::redirect::Policy;
 use std::fs::{self, File};
 use std::io::copy;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 const REDIRECT_LIMIT: usize = 10;
+const DEFAULT_DOWNLOAD_DIR: &str = ".prebuilt_down";
 
 fn build_client() -> Result<Client> {
     let client = Client::builder()
@@ -13,6 +14,14 @@ fn build_client() -> Result<Client> {
         .build()
         .context("failed to build http client")?;
     return Ok(client);
+}
+
+pub fn init_download_dir(path: Option<&Path>) -> Result<PathBuf> {
+    let path = path.unwrap_or_else(|| Path::new(DEFAULT_DOWNLOAD_DIR));
+    fs::create_dir_all(path)?;
+    let gitignore_path = Path::new(path).join(".gitignore");
+    fs::write(&gitignore_path, "*\n")?;
+    return Ok(path.to_path_buf());
 }
 
 pub fn download_to(url: &str, path: &Path) -> Result<()> {

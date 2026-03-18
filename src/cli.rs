@@ -7,7 +7,7 @@ use std::path::PathBuf;
 #[command(about = "Download and install prebuilt binaries defined in a config file")]
 pub struct Cli {
     #[arg(short, long, default_value = "prebuilt-down.toml")]
-    pub config: PathBuf,
+    pub config: Option<PathBuf>,
     #[arg(short, long)]
-    pub platform: Platform,
+    pub platform: Option<Platform>,
 }
