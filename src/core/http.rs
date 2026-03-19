@@ -5,6 +5,8 @@ use std::fs::{self, File};
 use std::io::copy;
 use std::path::{Path, PathBuf};
 
+use crate::traits::resolve_filename::ResponseExt;
+
 const REDIRECT_LIMIT: usize = 10;
 const DEFAULT_DOWNLOAD_DIR: &str = ".prebuilt-down";
 
@@ -16,30 +18,33 @@ fn build_client() -> Result<Client> {
     return Ok(client);
 }
 
-pub fn init_download_dir(path: Option<&Path>) -> Result<PathBuf> {
-    let path = path.unwrap_or_else(|| Path::new(DEFAULT_DOWNLOAD_DIR));
-    fs::create_dir_all(path)?;
-    let gitignore_path = Path::new(path).join(".gitignore");
-    fs::write(&gitignore_path, "*\n")?;
-    return Ok(path.to_path_buf());
+pub struct DownloadManager {
+    dir: PathBuf,
+    client: Client,
 }
 
-pub fn download_to(url: &str, path: &Path) -> Result<()> {
-    let client = build_client()?;
-    if let Some(parent) = path.parent() {
-        if !parent.as_os_str().is_empty() {
-            fs::create_dir_all(parent).context("failed to create download directory")?;
-        }
+impl DownloadManager {
+    pub fn initialize(dir: PathBuf) -> Result<Self> {
+        let client = build_client()?;
+        return Ok(Self { dir, client });
     }
 
-    let mut response = client
-        .get(url)
-        .send()
-        .context("failed to send download request")?
-        .error_for_status()
-        .context("http status error during download")?;
+    /// init download directory and create a .gitignore file within it,
+    pub fn init_download_dir(path: Option<&Path>) -> Result<PathBuf> {
+        let path = path.unwrap_or_else(|| Path::new(DEFAULT_DOWNLOAD_DIR));
+        fs::create_dir_all(path)?;
+        let gitignore_path = path.join(".gitignore");
+        fs::write(&gitignore_path, "*\n")?;
+        return Ok(path.to_path_buf());
+    }
 
-    let mut file = File::create(path).context("failed to create download file")?;
-    copy(&mut response, &mut file).context("failed to write download file")?;
-    return Ok(());
+    pub fn download(&self, url: &str, fallback_filename: &str) -> Result<PathBuf> {
+        let mut response = self.client.get(url).send()?.error_for_status()?;
+
+        let filename = response.resolve_filename(fallback_filename);
+        let download_path = self.dir.join(filename);
+        let mut file = File::create(&download_path)?;
+        copy(&mut response, &mut file)?;
+        return Ok(download_path);
+    }
 }

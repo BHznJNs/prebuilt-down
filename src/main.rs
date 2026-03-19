@@ -6,13 +6,15 @@ mod traits;
 
 use anyhow::{Context, Result, bail};
 use clap::Parser;
-use std::path::Path;
+use std::fs;
 
 use cli::Cli;
 use core::archive::ArchivePack;
 
+use crate::core::http::DownloadManager;
+
 fn process_config(
-    download_dir: &Path,
+    download_manager: &DownloadManager,
     platform: platform::Platform,
     config: &config::Config,
 ) -> Result<()> {
@@ -24,8 +26,8 @@ fn process_config(
         return Ok(());
     };
 
-    let download_path = download_dir.join(&config.name);
-    core::http::download_to(&platform_config.url, &download_path)
+    let download_path = download_manager
+        .download(&platform_config.url, &config.name)
         .with_context(|| format!("Failed to download {}, skipping", config.name))?;
 
     if let Some(ref hash_config) = platform_config.hash {
@@ -49,10 +51,10 @@ fn process_config(
         .extract(&config.inner.target)
         .with_context(|| format!("failed to extract {}", download_path.display()))?;
     } else {
-        eprintln!(
-            "Warning: archive type not specified for {}, skipping extraction",
-            config.name
-        );
+        // not declared as an archive, directly copy to target directory
+        let target_path = &config.inner.target;
+        fs::create_dir_all(target_path)?;
+        fs::copy(&download_path, target_path)?;
     }
     return Ok(());
 }
@@ -62,10 +64,11 @@ fn main() -> Result<()> {
     let platform = cli.platform.unwrap_or_else(platform::Platform::current);
 
     let configs = config::load_configs(&cli.config)?;
-    let download_dir = core::http::init_download_dir(None)?;
+    let download_dir = core::http::DownloadManager::init_download_dir(None)?;
+    let download_manager = DownloadManager::initialize(download_dir)?;
 
     for config in configs {
-        process_config(&download_dir, platform, &config)?;
+        process_config(&download_manager, platform, &config)?;
     }
     return Ok(());
 }
