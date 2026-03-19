@@ -16,7 +16,14 @@ fn process_config(
     platform: platform::Platform,
     config: &config::Config,
 ) -> Result<()> {
-    let platform_config = &config.inner.platforms[&platform];
+    let Some(platform_config) = config.inner.platforms.get(&platform) else {
+        eprintln!(
+            "Warning: platform {} not configured for {}, skipping",
+            platform, config.name
+        );
+        return Ok(());
+    };
+
     let download_path = download_dir.join(&config.name);
     core::http::download_to(&platform_config.url, &download_path)
         .with_context(|| format!("Failed to download {}, skipping", config.name))?;
