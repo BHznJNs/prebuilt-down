@@ -1,6 +1,6 @@
 use anyhow::Result;
 use flate2::read::GzDecoder;
-use std::fs::{File, create_dir_all};
+use std::fs::{self, File};
 use std::io;
 use std::path::{Path, PathBuf};
 use tar::Archive as TarArchive;
@@ -25,7 +25,7 @@ impl ArchivePack {
     }
 
     pub fn extract(&self, target_dir: &Path) -> Result<Vec<PathBuf>> {
-        create_dir_all(target_dir)?;
+        fs::create_dir_all(target_dir)?;
         match self.kind {
             ArchiveType::Zip => self.extract_zip(target_dir),
             ArchiveType::TarGz => self.extract_tar_gz(target_dir),
@@ -58,11 +58,11 @@ impl ArchivePack {
             let out_path = target_dir.join(&relative);
 
             if entry.is_dir() {
-                create_dir_all(&out_path)?;
+                fs::create_dir_all(&out_path)?;
                 continue;
             }
             if let Some(parent) = out_path.parent() {
-                create_dir_all(parent)?;
+                fs::create_dir_all(parent)?;
             }
             let mut out_file = File::create(&out_path)?;
             io::copy(&mut entry, &mut out_file)?;
@@ -127,11 +127,11 @@ impl ArchivePack {
 
             match entry.header().entry_type() {
                 tar::EntryType::Directory => {
-                    create_dir_all(&out_path)?;
+                    fs::create_dir_all(&out_path)?;
                 }
                 tar::EntryType::Regular => {
                     if let Some(parent) = out_path.parent() {
-                        create_dir_all(parent)?;
+                        fs::create_dir_all(parent)?;
                     }
                     let mut out_file = File::create(&out_path)?;
                     io::copy(&mut entry, &mut out_file)?;
