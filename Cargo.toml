@@ -20,10 +20,6 @@ toml = "0.8"
 xz2 = "0.1"
 zip = "2"
 
-# disable cargo-release publishing
-[package.metadata.release]
-publish = false
-
 # The profile that 'dist' will build with
 [profile.dist]
 inherits = "release"
