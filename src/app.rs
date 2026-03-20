@@ -4,11 +4,15 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use crate::config::Config;
-use crate::core::{archive::ArchivePack, cache::CacheManager, download::DownloadManager, verify};
+use crate::core::{
+    archive::ArchivePack, cache::CacheManager, download::DownloadManager, lock_file::LockFile,
+    verify,
+};
 use crate::types::platform::Platform;
 
 pub struct App {
     platform: Platform,
+    lock_file: LockFile,
     download_manager: Arc<DownloadManager>,
     cache_manager: Arc<CacheManager>,
 }
@@ -16,11 +20,13 @@ pub struct App {
 impl App {
     pub fn new(
         platform: Platform,
+        lock_file: LockFile,
         download_manager: Arc<DownloadManager>,
         cache_manager: Arc<CacheManager>,
     ) -> Self {
         Self {
             platform,
+            lock_file,
             download_manager,
             cache_manager,
         }
@@ -34,6 +40,14 @@ impl App {
             );
             return Ok(());
         };
+
+        if self
+            .cache_manager
+            .lock_file
+            .is_locked(&config.name, self.platform, &config.inner)
+        {
+            return Ok(());
+        }
 
         let downloaded_path = self
             .download_manager
@@ -52,7 +66,7 @@ impl App {
             }
         }
 
-        let mut output_files = if let Some(archive_type) = platform_config.archive {
+        let output_files = if let Some(archive_type) = platform_config.archive {
             let extracted = ArchivePack::new(
                 archive_type,
                 downloaded_path.clone(),
@@ -74,7 +88,13 @@ impl App {
             vec![PathBuf::from(target_file_name)]
         };
 
-        // write lockfile
+        self.cache_manager.lock_file.lock(
+            &config.name,
+            output_files,
+            self.platform,
+            platform_config,
+        );
+
         return Ok(());
     }
 }

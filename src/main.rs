@@ -12,8 +12,11 @@ use app::App;
 use cli::Cli;
 use types::platform::Platform;
 
-use crate::core::cache::CacheManager;
-use crate::core::download::DownloadManager;
+use crate::core::{
+    cache::CacheManager,
+    download::DownloadManager,
+    lock_file::{DEFAULT_LOCKFILE_NAME, LockFile},
+};
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
@@ -22,7 +25,8 @@ fn main() -> Result<()> {
 
     let cache_manager = CacheManager::init(None)?;
     let download_manager = DownloadManager::init(cache_manager.clone())?;
-    let app = App::new(platform, download_manager, cache_manager);
+    let lock_file = LockFile::load(&cache_manager.path_for(DEFAULT_LOCKFILE_NAME))?;
+    let app = App::new(platform, lock_file, download_manager, cache_manager);
 
     for config in configs.into_iter() {
         app.process_config(config)?;
