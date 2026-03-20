@@ -41,8 +41,8 @@ impl ArchivePack {
         for i in 0..archive.len() {
             let mut entry = archive.by_index(i)?;
             let Some(entry_path) = entry.enclosed_name() else {
-                eprintln!(
-                    "Encountered an unsafe entry path {}, skipping it.",
+                tracing::warn!(
+                    "Encountered an unsafe entry path `{}`, skipping it.",
                     entry.name()
                 );
                 continue;
@@ -79,8 +79,8 @@ impl ArchivePack {
         }
 
         if extracted.len() == 0 {
-            eprintln!(
-                "Root path {} for archive {} not found.",
+            tracing::warn!(
+                "Root path `{}` for archive `{}` not found.",
                 self.root.display(),
                 self.path.display()
             );
@@ -159,8 +159,8 @@ impl ArchivePack {
         }
 
         if extracted.len() == 0 {
-            eprintln!(
-                "Root path {} for archive {} not found.",
+            tracing::warn!(
+                "Root path `{}` for archive `{}` not found.",
                 self.root.display(),
                 self.path.display()
             );

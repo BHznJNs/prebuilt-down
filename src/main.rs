@@ -19,7 +19,7 @@ use crate::core::{
 };
 
 fn init_logger(verbose: u8) {
-    let level = match cli.verbose {
+    let level = match verbose {
         0 => tracing::Level::WARN,
         1 => tracing::Level::INFO,
         2 => tracing::Level::DEBUG,
@@ -45,7 +45,7 @@ fn main() -> Result<()> {
         let name = config.name.clone();
         match app.process_config(config) {
             Ok(_) => {}
-            Err(e) => eprintln!("Failed to process '{}':\n{e:#}", name),
+            Err(e) => tracing::error!("Failed to process `{}`:\n{e:#}", name),
         }
     }
     app.save()?;

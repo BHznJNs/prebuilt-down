@@ -45,7 +45,7 @@ impl App {
         };
 
         if self.lock_file.is_locked(self.platform, &config) {
-            eprintln!("Config for {} not changed, skipping", config.name);
+            tracing::warn!("Config for `{}` not changed, skipping", config.name);
             return Ok(());
         }
 

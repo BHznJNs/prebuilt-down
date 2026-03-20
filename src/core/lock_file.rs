@@ -89,7 +89,7 @@ impl LockFile {
             return false;
         }
         let Ok(actual_files) = config.target.collect_files() else {
-            eprintln!("Failed to read directory {}.", config.target.display());
+            tracing::warn!("Failed to read directory `{}`.", config.target.display());
             return false;
         };
         let mut expected_files = entry.files.clone();
