@@ -74,7 +74,7 @@ impl App {
             vec![PathBuf::from(target_file_name)]
         };
 
-        // write_state(&state_path, output_files, platform_config.hash.as_ref())?;
+        // write lockfile
         return Ok(());
     }
 }

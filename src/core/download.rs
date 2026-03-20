@@ -7,7 +7,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use crate::core::cache::CacheManager;
-use crate::traits::resolve_filename::ResponseExt;
+use crate::traits::response_ext::ResponseExt;
 
 const REDIRECT_LIMIT: usize = 10;
 

@@ -2,9 +2,12 @@ use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
+use std::io;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
+use crate::config::PrebuiltConfig;
+use crate::traits::path_ext::PathExt;
 use crate::types::platform::Platform;
 
 const DEFAULT_CACHE_DIR: &str = ".prebuilt-down";
@@ -13,7 +16,7 @@ const DEFAULT_LOCKFILE_NAME: &str = "prebuilt-down.lock";
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LockFile {
     #[serde(flatten)]
-    pub entries: HashMap<String, HashMap<String, LockEntry>>,
+    pub entries: HashMap<String, HashMap<Platform, LockEntry>>,
 }
 
 impl LockFile {
@@ -34,8 +37,52 @@ impl LockFile {
         return Ok(());
     }
 
-    pub fn is_locked(&self, platform: Platform) {
-        todo!()
+    pub fn lock(&self, ...) {
+        //
+    }
+
+    pub fn is_locked(&self, name: &str, platform: Platform, config: &PrebuiltConfig) -> bool {
+        let Some(entry) = self
+            .entries
+            .get(name)
+            .and_then(|platforms| platforms.get(&platform))
+        else {
+            return false;
+        };
+
+        let Some(platform_config) = config.platforms.get(&platform) else {
+            return false;
+        };
+
+        // compare url
+        if entry.url != platform_config.url {
+            return false;
+        }
+
+        // compare hash
+        if let Some(ref hash_config) = platform_config.hash {
+            let expected = hash_config.digest.trim().to_ascii_lowercase();
+            let actual = match entry.digest.as_ref() {
+                Some(digest) => digest.trim().to_ascii_lowercase(),
+                None => return false,
+            };
+            if expected != actual {
+                return false;
+            }
+        }
+
+        if !config.target.exists() {
+            return false;
+        }
+        let Ok(actual_files) = config.target.collect_files() else {
+            eprintln!("Failed to read directory {}.", config.target.display());
+            return false;
+        };
+        let mut expected_files = entry.files.clone();
+        let mut actual_files = actual_files;
+        expected_files.sort();
+        actual_files.sort();
+        expected_files == actual_files
     }
 }
 
@@ -71,10 +118,5 @@ impl CacheManager {
 
     pub fn path_for(&self, filename: &str) -> PathBuf {
         self.dir.join(filename)
-    }
-
-    pub fn check_exists(name: &str, platform: Platform) -> Result<bool> {
-        let file_name = format!("{name}-{platform}.json");
-        return Ok(true);
     }
 }
