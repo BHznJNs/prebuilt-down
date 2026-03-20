@@ -18,8 +18,21 @@ use crate::core::{
     lock_file::{DEFAULT_LOCKFILE_NAME, LockFile},
 };
 
+fn init_logger(verbose: u8) {
+    let level = match cli.verbose {
+        0 => tracing::Level::WARN,
+        1 => tracing::Level::INFO,
+        2 => tracing::Level::DEBUG,
+        _ => tracing::Level::TRACE,
+    };
+
+    tracing_subscriber::fmt().with_max_level(level).init();
+}
+
 fn main() -> Result<()> {
     let cli = Cli::parse();
+    init_logger(cli.verbose);
+
     let platform = cli.platform.unwrap_or_else(Platform::current);
     let configs = config::load_configs(&cli.config)?;
 

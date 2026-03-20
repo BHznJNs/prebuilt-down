@@ -1,4 +1,4 @@
-use clap::Parser;
+use clap::{ArgAction, Parser};
 use std::path::PathBuf;
 
 use crate::types::platform::Platform;
@@ -11,4 +11,6 @@ pub struct Cli {
     pub config: PathBuf,
     #[arg(short, long)]
     pub platform: Option<Platform>,
+    #[arg(short, long, action = ArgAction::Count)]
+    pub verbose: u8,
 }
