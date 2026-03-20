@@ -1,3 +1,4 @@
 pub mod archive;
-pub mod http;
+pub mod cache;
+pub mod download;
 pub mod verify;

@@ -1,6 +1,7 @@
-use super::platform::Platform;
 use clap::Parser;
 use std::path::PathBuf;
+
+use crate::types::platform::Platform;
 
 #[derive(Parser, Debug)]
 #[command(name = "prebuilt-down")]

@@ -55,3 +55,42 @@ url = "https://github.com/BurntSushi/ripgrep/releases/download/15.1.0/ripgrep-15
 root = "ripgrep-15.1.0-x86_64-pc-windows-msvc/"
 archive = "zip"
 ```
+
+## Rust 代码规范
+
+### 何时保留命名空间？
+
+1. 函数
+这是最重要的惯例，引入函数时保留其父模块，避免混淆函数来源：
+
+```
+// ❌ 不推荐：直接引入函数，来源不明
+use std::fs::read_to_string;
+read_to_string("file.txt")?;
+
+// ✅ 推荐：保留模块，来源清晰
+use std::fs;
+fs::read_to_string("file.txt")?;
+```
+
+2. 同名冲突 - 用路径区分
+
+```rust
+// 两个 Result 类型同时用，必须保留路径
+use std::fmt;
+use std::io;
+
+fn foo() -> fmt::Result { ... }
+fn bar() -> io::Result<()> { ... }
+```
+
+3. 路径本身有语义价值
+
+```
+rust// ✅ 保留路径，语义更丰富
+std::mem::drop(val);       // "内存操作的 drop"，一目了然
+std::thread::spawn(|| {}); // 明确是线程操作
+
+// vs 引入后反而显得突兀
+use std::mem::drop; // drop 是内置名，这样写还会 shadow 掉它！
+```

@@ -2,7 +2,7 @@ use anyhow::{Context, Result};
 use std::fs;
 use std::path::Path;
 
-use super::types::{Config, ConfigMap};
+use super::{Config, ConfigMap};
 
 pub fn load_configs(path: &Path) -> Result<Vec<Config>> {
     let content = fs::read_to_string(path)

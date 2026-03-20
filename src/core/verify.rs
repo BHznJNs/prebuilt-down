@@ -4,10 +4,7 @@ use std::fs::File;
 use std::io::Read;
 use std::path::Path;
 
-use crate::{
-    config::{HashAlgorithm, HashConfig},
-    traits::to_hex::ToHex,
-};
+use crate::{config::HashConfig, traits::to_hex::ToHex, types::hash::HashAlgorithm};
 
 pub fn verify_file(path: &Path, hash: &HashConfig) -> Result<bool> {
     let actual = compute_digest(path, hash.algorithm)?;
