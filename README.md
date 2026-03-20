@@ -2,6 +2,24 @@
 
 A CLI tool that helps automatically resolve the external prebuilt binary dependencies in your codebases.
 
+## Installation
+
+With [binstall](https://github.com/cargo-bins/cargo-binstall) (recommanded):
+```
+cargo binstall prebuilt-down
+```
+
+With cargo (build from source):
+```
+cargo install prebuilt-down
+```
+
+Within GitHub Actions:
+```
+- uses: cargo-bins/cargo-binstall@main
+- run: cargo binstall prebuilt-down --no-confirm
+```
+
 ## Usage
 
 This will automatically read the `prebuilt-down.toml` file in the cwd and download prebuilts:
