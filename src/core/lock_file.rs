@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use crate::config::{PlatformEntry, PrebuiltConfig};
+use crate::config::{Config, PlatformEntry};
 use crate::traits::path_ext::PathExt;
 use crate::types::platform::Platform;
 
@@ -37,7 +37,7 @@ impl LockFile {
     pub fn lock(
         &mut self,
         name: &str,
-        output_files: Vec<PathBuf>,
+        files: Vec<PathBuf>,
         platform: Platform,
         platform_config: &PlatformEntry,
     ) {
@@ -47,7 +47,7 @@ impl LockFile {
                 .hash
                 .as_ref()
                 .map(|hash_config| hash_config.digest.clone()),
-            files: output_files,
+            files,
         };
         self.entries
             .entry(name.to_string())
@@ -55,10 +55,10 @@ impl LockFile {
             .insert(platform, entry);
     }
 
-    pub fn is_locked(&self, name: &str, platform: Platform, config: &PrebuiltConfig) -> bool {
+    pub fn is_locked(&self, platform: Platform, config: &Config) -> bool {
         let Some(entry) = self
             .entries
-            .get(name)
+            .get(&config.name)
             .and_then(|platforms| platforms.get(&platform))
         else {
             return false;

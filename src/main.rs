@@ -26,10 +26,15 @@ fn main() -> Result<()> {
     let cache_manager = CacheManager::init(None)?;
     let download_manager = DownloadManager::init(cache_manager.clone())?;
     let lock_file = LockFile::load(&cache_manager.path_for(DEFAULT_LOCKFILE_NAME))?;
-    let app = App::new(platform, lock_file, download_manager, cache_manager);
+    let mut app = App::new(platform, lock_file, download_manager, cache_manager);
 
     for config in configs.into_iter() {
-        app.process_config(config)?;
+        let name = config.name.clone();
+        match app.process_config(config) {
+            Ok(_) => {}
+            Err(e) => eprintln!("Failed to process '{}':\n{e:#}", name),
+        }
     }
+    app.save()?;
     return Ok(());
 }

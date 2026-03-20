@@ -5,7 +5,10 @@ use std::sync::Arc;
 
 use crate::config::Config;
 use crate::core::{
-    archive::ArchivePack, cache::CacheManager, download::DownloadManager, lock_file::LockFile,
+    archive::ArchivePack,
+    cache::CacheManager,
+    download::DownloadManager,
+    lock_file::{DEFAULT_LOCKFILE_NAME, LockFile},
     verify,
 };
 use crate::types::platform::Platform;
@@ -32,20 +35,17 @@ impl App {
         }
     }
 
-    pub fn process_config(&self, config: Config) -> Result<()> {
-        let Some(platform_config) = config.inner.platforms.get(&self.platform) else {
-            eprintln!(
+    pub fn process_config(&mut self, config: Config) -> Result<()> {
+        let Some(platform_config) = config.platforms.get(&self.platform) else {
+            bail!(
                 "Warning: platform {} not configured for {}, skipping",
-                self.platform, config.name
+                self.platform,
+                config.name
             );
-            return Ok(());
         };
 
-        if self
-            .cache_manager
-            .lock_file
-            .is_locked(&config.name, self.platform, &config.inner)
-        {
+        if self.lock_file.is_locked(self.platform, &config) {
+            eprintln!("Config for {} not changed, skipping", config.name);
             return Ok(());
         }
 
@@ -72,11 +72,11 @@ impl App {
                 downloaded_path.clone(),
                 platform_config.root.clone(),
             )
-            .extract(&config.inner.target)
+            .extract(&config.target)
             .with_context(|| format!("failed to extract {}", downloaded_path.display()))?;
             extracted
         } else {
-            let target_path = &config.inner.target;
+            let target_path = &config.target;
             fs::create_dir_all(target_path)?;
 
             let target_file_name = downloaded_path
@@ -88,13 +88,15 @@ impl App {
             vec![PathBuf::from(target_file_name)]
         };
 
-        self.cache_manager.lock_file.lock(
-            &config.name,
-            output_files,
-            self.platform,
-            platform_config,
-        );
+        self.lock_file
+            .lock(&config.name, output_files, self.platform, platform_config);
 
+        return Ok(());
+    }
+
+    pub fn save(&self) -> Result<()> {
+        let lock_file_path = self.cache_manager.path_for(DEFAULT_LOCKFILE_NAME);
+        self.lock_file.save(&lock_file_path)?;
         return Ok(());
     }
 }

@@ -11,7 +11,7 @@ pub fn load_configs(path: &Path) -> Result<Vec<Config>> {
         .with_context(|| format!("failed to parse config toml: {}", path.display()))?;
     let configs: Vec<Config> = config_map
         .into_iter()
-        .map(|(name, p)| Config { name, inner: p })
+        .map(|config_pair| Config::from(config_pair))
         .collect();
     return Ok(configs);
 }

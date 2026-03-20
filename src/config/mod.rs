@@ -36,5 +36,16 @@ pub type ConfigMap = HashMap<String, PrebuiltConfig>;
 #[derive(Debug)]
 pub struct Config {
     pub name: String,
-    pub inner: PrebuiltConfig,
+    pub target: PathBuf,
+    pub platforms: HashMap<Platform, PlatformEntry>,
+}
+
+impl From<(String, PrebuiltConfig)> for Config {
+    fn from((name, inner): (String, PrebuiltConfig)) -> Self {
+        Config {
+            name,
+            target: inner.target,
+            platforms: inner.platforms,
+        }
+    }
 }

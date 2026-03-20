@@ -1,6 +1,4 @@
 /target
-
-bin/
-.prebuilt_down/
+/bin
 
 *.test.toml
