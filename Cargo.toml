@@ -3,6 +3,7 @@ name = "prebuilt-down"
 version = "0.1.0"
 edition = "2024"
 repository = "https://github.com/BHznJNs/prebuilt-down"
+publish = false
 
 [dependencies]
 anyhow = "1"
