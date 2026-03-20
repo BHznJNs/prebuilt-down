@@ -3,7 +3,9 @@ name = "prebuilt-down"
 version = "0.1.1"
 edition = "2024"
 repository = "https://github.com/BHznJNs/prebuilt-down"
-publish = false
+description = "A CLI tool for resolve prebuilt binary dependencies"
+readme = "README.md"
+license = "GPL-v3"
 
 [dependencies]
 anyhow = "1"
