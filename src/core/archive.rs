@@ -17,10 +17,14 @@ pub struct ArchivePack {
 
 impl ArchivePack {
     pub fn new(kind: ArchiveType, path: impl Into<PathBuf>, root: impl Into<PathBuf>) -> Self {
+        let mut root: PathBuf = root.into();
+        if root == Path::new(".") {
+            root = PathBuf::new();
+        }
         Self {
             kind,
             path: path.into(),
-            root: root.into(),
+            root,
         }
     }
 
