@@ -43,7 +43,7 @@ fn main() -> Result<()> {
 
     for config in configs.into_iter() {
         let name = config.name.clone();
-        match app.process_config(config) {
+        match app.process_config(config, cli.force) {
             Ok(_) => {}
             Err(e) => tracing::error!("Failed to process `{}`:\n{e:#}", name),
         }

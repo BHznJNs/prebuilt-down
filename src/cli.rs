@@ -13,4 +13,6 @@ pub struct Cli {
     pub platform: Option<Platform>,
     #[arg(short, long, action = ArgAction::Count)]
     pub verbose: u8,
+    #[arg(short, long)]
+    pub force: bool,
 }

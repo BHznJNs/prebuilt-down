@@ -35,7 +35,7 @@ impl App {
         }
     }
 
-    pub fn process_config(&mut self, config: Config) -> Result<()> {
+    pub fn process_config(&mut self, config: Config, force: bool) -> Result<()> {
         let Some(platform_config) = config.platforms.get(&self.platform) else {
             bail!(
                 "Warning: platform {} not configured for {}, skipping",
@@ -44,7 +44,7 @@ impl App {
             );
         };
 
-        if self.lock_file.is_locked(self.platform, &config) {
+        if !force && self.lock_file.is_locked(self.platform, &config) {
             tracing::warn!("Config for `{}` not changed, skipping", config.name);
             return Ok(());
         }
