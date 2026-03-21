@@ -24,8 +24,8 @@ impl LockFile {
             });
         }
         let content = fs::read_to_string(path)?;
-        let lockfile = serde_json::from_str(&content)?;
-        return Ok(lockfile);
+        let lock_file = serde_json::from_str(&content)?;
+        return Ok(lock_file);
     }
 
     pub fn save(&self, path: &Path) -> Result<()> {
