@@ -22,6 +22,10 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 xz2 = "0.1"
 zip = "2"
 
+[dev-dependencies]
+httpmock = "0.8"
+tempfile = "3"
+
 # The profile that 'dist' will build with
 [profile.dist]
 inherits = "release"

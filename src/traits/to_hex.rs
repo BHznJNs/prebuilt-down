@@ -14,3 +14,14 @@ impl ToHex for [u8] {
         return s;
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::ToHex;
+
+    #[test]
+    fn to_hex_outputs_lowercase_hex() {
+        let data = [0x00, 0x0f, 0x10, 0xab, 0xff];
+        assert_eq!(data.to_hex(), "000f10abff");
+    }
+}

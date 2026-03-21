@@ -28,6 +28,69 @@ impl ResponseExt for Response {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::ResponseExt;
+    use httpmock::Method::GET;
+    use httpmock::MockServer;
+    use reqwest::blocking::Client;
+
+    #[test]
+    fn resolve_filename_prefers_content_disposition() {
+        let server = MockServer::start();
+        let _mock = server.mock(|when, then| {
+            when.method(GET).path("/download");
+            then.status(200)
+                .header("Content-Disposition", "attachment; filename=\"report.pdf\"")
+                .body("ok");
+        });
+
+        let client = Client::new();
+        let response = client
+            .get(format!("{}/download", server.base_url()))
+            .send()
+            .unwrap();
+
+        assert_eq!(response.resolve_filename("fallback"), "report.pdf");
+    }
+
+    #[test]
+    fn resolve_filename_uses_url_when_no_header() {
+        let server = MockServer::start();
+        let _mock = server.mock(|when, then| {
+            when.method(GET).path("/files/archive.zip");
+            then.status(200).body("ok");
+        });
+
+        let client = Client::new();
+        let response = client
+            .get(format!("{}/files/archive.zip", server.base_url()))
+            .send()
+            .unwrap();
+
+        assert_eq!(response.resolve_filename("fallback"), "archive.zip");
+    }
+
+    #[test]
+    fn resolve_filename_falls_back_to_content_type() {
+        let server = MockServer::start();
+        let _mock = server.mock(|when, then| {
+            when.method(GET).path("/resource");
+            then.status(200)
+                .header("Content-Type", "application/json")
+                .body("{}");
+        });
+
+        let client = Client::new();
+        let response = client
+            .get(format!("{}/resource", server.base_url()))
+            .send()
+            .unwrap();
+
+        assert_eq!(response.resolve_filename("fallback"), "fallback.json");
+    }
+}
+
 /// 解析 Content-Disposition 响应头
 /// 支持 filename* (RFC 5987, UTF-8 编码) 和 filename 两种形式
 fn parse_content_disposition(response: &Response) -> Option<String> {

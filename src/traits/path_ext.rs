@@ -26,3 +26,29 @@ impl PathExt for Path {
         inner(self, self)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::PathExt;
+    use std::fs;
+    use std::path::PathBuf;
+    use tempfile::tempdir;
+
+    #[test]
+    fn collect_files_returns_relative_paths() {
+        let dir = tempdir().unwrap();
+        let root = dir.path();
+
+        fs::create_dir_all(root.join("a/b")).unwrap();
+        fs::write(root.join("a/file1.txt"), "1").unwrap();
+        fs::write(root.join("a/b/file2.txt"), "2").unwrap();
+
+        let mut files = root.collect_files().unwrap();
+        files.sort();
+
+        let mut expected = vec![PathBuf::from("a/file1.txt"), PathBuf::from("a/b/file2.txt")];
+        expected.sort();
+
+        assert_eq!(files, expected);
+    }
+}
