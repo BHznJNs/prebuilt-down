@@ -1,5 +1,4 @@
-# .github/workflows/release.yml
-name: Release
+name: Release to NPM
 
 on:
   workflow_dispatch:
@@ -79,7 +78,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "lts/*"
           registry-url: "https://registry.npmjs.org"
 
       - name: Install musl tools
@@ -109,7 +108,7 @@ jobs:
           chmod +x "npm/${{ matrix.npm-pkg }}/${{ matrix.binary }}" || true
 
       - name: Sync versions from Cargo.toml
-        run: node npm/scripts/sync-version.js
+        run: node npm/scripts/sync-version.mjs
 
       - name: Publish platform package
         working-directory: npm/${{ matrix.npm-pkg }}
@@ -130,7 +129,7 @@ jobs:
           registry-url: "https://registry.npmjs.org"
 
       - name: Sync versions from Cargo.toml
-        run: node npm/scripts/sync-version.js
+        run: node npm/scripts/sync-version.mjs
 
       - name: Publish main package
         working-directory: npm/prebuilt-down
