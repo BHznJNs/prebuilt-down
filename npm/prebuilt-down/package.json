@@ -1,6 +1,7 @@
 {
   "name": "prebuilt-down",
   "version": "0.0.0",
+  "repository": "github:BHznJNs/prebuilt-down",
   "bin": {
     "prebuilt-down": "bin/prebuilt-down.js"
   },
@@ -8,14 +9,14 @@
     "bin/prebuilt-down.js"
   ],
   "optionalDependencies": {
-    "@prebuilt-down/prebuilt-down-win32-x64": "0.0.0",
-    "@prebuilt-down/prebuilt-down-win32-arm64": "0.0.0",
-    "@prebuilt-down/prebuilt-down-darwin-x64": "0.0.0",
-    "@prebuilt-down/prebuilt-down-darwin-arm64": "0.0.0",
-    "@prebuilt-down/prebuilt-down-linux-x64": "0.0.0",
-    "@prebuilt-down/prebuilt-down-linux-arm64": "0.0.0",
-    "@prebuilt-down/prebuilt-down-linux-x64-musl": "0.0.0",
-    "@prebuilt-down/prebuilt-down-linux-arm64-musl": "0.0.0"
+    "@prebuilt-down/win32-x64": "0.0.0",
+    "@prebuilt-down/win32-arm64": "0.0.0",
+    "@prebuilt-down/darwin-x64": "0.0.0",
+    "@prebuilt-down/darwin-arm64": "0.0.0",
+    "@prebuilt-down/linux-x64": "0.0.0",
+    "@prebuilt-down/linux-arm64": "0.0.0",
+    "@prebuilt-down/linux-x64-musl": "0.0.0",
+    "@prebuilt-down/linux-arm64-musl": "0.0.0"
   },
   "publishConfig": {
     "access": "public"

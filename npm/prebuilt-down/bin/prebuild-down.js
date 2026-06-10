@@ -1,7 +1,6 @@
 #!/usr/bin/env node
-
+const { spawnSync, execSync } = require("node:child_process");
 const { platform, arch, env } = process;
-const { spawnSync, execSync } = require("child_process");
 
 function isMusl() {
   let stderr;
@@ -15,20 +14,20 @@ function isMusl() {
 
 const PLATFORMS = {
   win32: {
-    x64: "@prebuilt-down/prebuilt-down-win32-x64/prebuilt-down.exe",
-    arm64: "@prebuilt-down/prebuilt-down-win32-arm64/prebuilt-down.exe",
+    x64: "@prebuilt-down/win32-x64/prebuilt-down.exe",
+    arm64: "@prebuilt-down/win32-arm64/prebuilt-down.exe",
   },
   darwin: {
-    x64: "@prebuilt-down/prebuilt-down-darwin-x64/prebuilt-down",
-    arm64: "@prebuilt-down/prebuilt-down-darwin-arm64/prebuilt-down",
+    x64: "@prebuilt-down/darwin-x64/prebuilt-down",
+    arm64: "@prebuilt-down/darwin-arm64/prebuilt-down",
   },
   linux: {
-    x64: "@prebuilt-down/prebuilt-down-linux-x64/prebuilt-down",
-    arm64: "@prebuilt-down/prebuilt-down-linux-arm64/prebuilt-down",
+    x64: "@prebuilt-down/linux-x64/prebuilt-down",
+    arm64: "@prebuilt-down/linux-arm64/prebuilt-down",
   },
   "linux-musl": {
-    x64: "@prebuilt-down/prebuilt-down-linux-x64-musl/prebuilt-down",
-    arm64: "@prebuilt-down/prebuilt-down-linux-arm64-musl/prebuilt-down",
+    x64: "@prebuilt-down/linux-x64-musl/prebuilt-down",
+    arm64: "@prebuilt-down/linux-arm64-musl/prebuilt-down",
   },
 };
 
