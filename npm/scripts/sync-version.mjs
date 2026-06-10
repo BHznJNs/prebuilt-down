@@ -27,9 +27,9 @@ const NPM_DIR = path.resolve(PROJECT_ROOT, "./npm");
 const PACKAGES = [
   "prebuilt-down",
   "@prebuilt-down/win32-x64",
-  // "@prebuilt-down/win32-arm64",
-  // "@prebuilt-down/darwin-x64",
-  // "@prebuilt-down/darwin-arm64",
+  "@prebuilt-down/win32-arm64",
+  "@prebuilt-down/darwin-x64",
+  "@prebuilt-down/darwin-arm64",
   // "@prebuilt-down/linux-x64",
   // "@prebuilt-down/linux-arm64",
   // "@prebuilt-down/linux-x64-musl",

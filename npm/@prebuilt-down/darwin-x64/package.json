@@ -1,0 +1,16 @@
+{
+  "name": "@prebuilt-down/darwin-x64",
+  "version": "0.0.0",
+  "os": [
+    "darwin"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "files": [
+    "prebuilt-down"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -40,30 +40,30 @@ jobs:
           #     binary: prebuilt-down,
           #     use-cross: true,
           #   }
-          # - {
-          #     os: macos-latest,
-          #     target: x86_64-apple-darwin,
-          #     npm-pkg: "@prebuilt-down/darwin-x64",
-          #     binary: prebuilt-down,
-          #   }
-          # - {
-          #     os: macos-latest,
-          #     target: aarch64-apple-darwin,
-          #     npm-pkg: "@prebuilt-down/darwin-arm64",
-          #     binary: prebuilt-down,
-          #   }
+          - {
+              os: macos-latest,
+              target: x86_64-apple-darwin,
+              npm-pkg: "@prebuilt-down/darwin-x64",
+              binary: prebuilt-down,
+            }
+          - {
+              os: macos-latest,
+              target: aarch64-apple-darwin,
+              npm-pkg: "@prebuilt-down/darwin-arm64",
+              binary: prebuilt-down,
+            }
           - {
               os: windows-latest,
               target: x86_64-pc-windows-msvc,
               npm-pkg: "@prebuilt-down/win32-x64",
               binary: prebuilt-down.exe,
             }
-          # - {
-          #     os: windows-latest,
-          #     target: aarch64-pc-windows-msvc,
-          #     npm-pkg: "@prebuilt-down/win32-arm64",
-          #     binary: prebuilt-down.exe,
-          #   }
+          - {
+              os: windows-latest,
+              target: aarch64-pc-windows-msvc,
+              npm-pkg: "@prebuilt-down/win32-arm64",
+              binary: prebuilt-down.exe,
+            }
 
     steps:
       - uses: actions/checkout@v4
