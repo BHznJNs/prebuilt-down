@@ -94,7 +94,7 @@ For each binary defined in the config, prebuilt-down executes this pipeline:
 
 ### Cache & Lock File
 
-- Cache directory: `.prebuilt-down/` (auto-created, gitignored)
+- Cache directory: `.prebuilt-down/` (auto-created; the tool writes a `.gitignore` inside it automatically — no need to add `.prebuilt-down/` to the project's `.gitignore`)
 - Lock file: `.prebuilt-down/prebuilt-down.lock` (JSON)
 - The lock file records the URL, hash digest, and extracted file list per platform for each binary. This prevents redundant downloads when nothing changed.
 - Use `--force` to bypass the lock check.
