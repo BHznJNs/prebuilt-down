@@ -4,9 +4,13 @@ import { fileURLToPath } from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const PROJECT_ROOT = path.resolve(__dirname, "../../");
 
 function readCargoVersion() {
-  const toml = fs.readFileSync(path.resolve(__dirname, "./Cargo.toml"), "utf8");
+  const toml = fs.readFileSync(
+    path.resolve(PROJECT_ROOT, "./Cargo.toml"),
+    "utf8",
+  );
   const match = toml.match(/^version\s*=\s*"([^"]+)"/m);
   if (!match) throw new Error("Can not find 'version' field in Cargo.toml");
   return match[1];
@@ -18,7 +22,7 @@ if (!/^\d+\.\d+\.\d+/.test(version)) {
   process.exit(1);
 }
 
-const NPM_DIR = path.resolve(__dirname, "./npm");
+const NPM_DIR = path.resolve(PROJECT_ROOT, "./npm");
 
 const PACKAGES = [
   "prebuilt-down",
