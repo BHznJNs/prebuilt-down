@@ -9,6 +9,9 @@ jobs:
   build:
     name: Build ${{ matrix.npm-pkg }}
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+      id-token: write
     strategy:
       fail-fast: false
       matrix:
@@ -81,6 +84,9 @@ jobs:
           node-version: "lts/*"
           registry-url: "https://registry.npmjs.org"
 
+      - name: Upgrade npm
+        run: npm install -g npm@latest
+
       - name: Install musl tools
         if: ${{ matrix.install-musl }}
         run: sudo apt-get install -y musl-tools
@@ -112,9 +118,7 @@ jobs:
 
       - name: Publish platform package
         working-directory: npm/${{ matrix.npm-pkg }}
-        run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public --provenance
 
   publish-main:
     name: Publish main package
@@ -133,6 +137,4 @@ jobs:
 
       - name: Publish main package
         working-directory: npm/prebuilt-down
-        run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public --provenance
