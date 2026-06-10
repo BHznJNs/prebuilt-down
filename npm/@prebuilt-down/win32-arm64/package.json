@@ -1,6 +1,7 @@
 {
   "name": "@prebuilt-down/win32-arm64",
   "version": "0.0.0",
+  "repository": "github:BHznJNs/prebuilt-down",
   "os": [
     "win32"
   ],

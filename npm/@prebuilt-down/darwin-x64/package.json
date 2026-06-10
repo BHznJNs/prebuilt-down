@@ -1,6 +1,7 @@
 {
   "name": "@prebuilt-down/darwin-x64",
   "version": "0.0.0",
+  "repository": "github:BHznJNs/prebuilt-down",
   "os": [
     "darwin"
   ],
