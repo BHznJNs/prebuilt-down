@@ -4,7 +4,12 @@ A CLI tool that helps automatically resolve the external prebuilt binary depende
 
 ## Installation
 
-With [binstall](https://github.com/cargo-bins/cargo-binstall) (recommanded):
+With npm (recommanded):
+```
+npm install prebuilt-down --save-dev
+```
+
+With [binstall](https://github.com/cargo-bins/cargo-binstall):
 ```
 cargo binstall prebuilt-down
 ```
