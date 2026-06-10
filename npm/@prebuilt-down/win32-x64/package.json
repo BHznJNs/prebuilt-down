@@ -1,0 +1,17 @@
+{
+  "name": "@prebuilt-down/win32-x64",
+  "version": "0.0.0",
+  "repository": "github:BHznJNs/prebuilt-down",
+  "os": [
+    "win32"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "files": [
+    "prebuilt-down.exe"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

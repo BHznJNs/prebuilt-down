@@ -1,0 +1,143 @@
+name: Release to NPM
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+jobs:
+  build:
+    name: Build ${{ matrix.npm-pkg }}
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # - {
+          #     os: ubuntu-latest,
+          #     target: x86_64-unknown-linux-gnu,
+          #     npm-pkg: "@prebuilt-down/linux-x64",
+          #     binary: prebuilt-down,
+          #   }
+          # - {
+          #     os: ubuntu-latest,
+          #     target: aarch64-unknown-linux-gnu,
+          #     npm-pkg: "@prebuilt-down/linux-arm64",
+          #     binary: prebuilt-down,
+          #     use-cross: true,
+          #   }
+          # - {
+          #     os: ubuntu-latest,
+          #     target: x86_64-unknown-linux-musl,
+          #     npm-pkg: "@prebuilt-down/linux-x64-musl",
+          #     binary: prebuilt-down,
+          #     install-musl: true,
+          #   }
+          # - {
+          #     os: ubuntu-latest,
+          #     target: aarch64-unknown-linux-musl,
+          #     npm-pkg: "@prebuilt-down/linux-arm64-musl",
+          #     binary: prebuilt-down,
+          #     use-cross: true,
+          #   }
+          - {
+              os: macos-latest,
+              target: x86_64-apple-darwin,
+              npm-pkg: "@prebuilt-down/darwin-x64",
+              binary: prebuilt-down,
+            }
+          - {
+              os: macos-latest,
+              target: aarch64-apple-darwin,
+              npm-pkg: "@prebuilt-down/darwin-arm64",
+              binary: prebuilt-down,
+            }
+          - {
+              os: windows-latest,
+              target: x86_64-pc-windows-msvc,
+              npm-pkg: "@prebuilt-down/win32-x64",
+              binary: prebuilt-down.exe,
+            }
+          - {
+              os: windows-latest,
+              target: aarch64-pc-windows-msvc,
+              npm-pkg: "@prebuilt-down/win32-arm64",
+              binary: prebuilt-down.exe,
+            }
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.target }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Upgrade npm
+        run: npm install -g npm@latest
+
+      - name: Install musl tools
+        if: ${{ matrix.install-musl }}
+        run: sudo apt-get install -y musl-tools
+
+      - name: Install cross
+        if: ${{ matrix.use-cross }}
+        uses: taiki-e/install-action@v2 # 比 cargo install cross 快很多
+        with:
+          tool: cross
+
+      - name: Build
+        shell: bash
+        run: |
+          if [ "${{ matrix.use-cross }}" = "true" ]; then
+            cross build --release --target ${{ matrix.target }}
+          else
+            cargo build --release --target ${{ matrix.target }}
+          fi
+
+      - name: Copy binary into npm package
+        shell: bash
+        run: |
+          cp "target/${{ matrix.target }}/release/${{ matrix.binary }}" \
+             "npm/${{ matrix.npm-pkg }}/${{ matrix.binary }}"
+          chmod +x "npm/${{ matrix.npm-pkg }}/${{ matrix.binary }}" || true
+
+      - name: Sync versions from Cargo.toml
+        run: node npm/scripts/sync-version.mjs
+
+      - name: Publish platform package
+        working-directory: npm/${{ matrix.npm-pkg }}
+        run: npm publish --access public --provenance
+
+  publish-main:
+    name: Publish main package
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Sync versions from Cargo.toml
+        run: node npm/scripts/sync-version.mjs
+
+      - name: Publish main package
+        working-directory: npm/prebuilt-down
+        run: npm publish --access public --provenance
