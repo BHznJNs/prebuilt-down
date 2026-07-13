@@ -138,6 +138,9 @@ jobs:
       - name: Sync versions from Cargo.toml
         run: node npm/scripts/sync-version.mjs
 
+      - name: Sync README file
+        run: node npm/scripts/sync-readme.mjs
+
       - name: Publish main package
         working-directory: npm/prebuilt-down
         run: npm publish --access public --provenance

@@ -6,6 +6,7 @@
     "prebuilt-down": "bin/prebuilt-down.js"
   },
   "files": [
+    "README.md",
     "bin/prebuilt-down.js"
   ],
   "optionalDependencies": {
