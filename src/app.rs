@@ -5,7 +5,7 @@ use std::sync::Arc;
 
 use crate::config::Config;
 use crate::core::{
-    archive::ArchivePack,
+    archive::ArchivePackBuilder,
     cache::CacheManager,
     download::DownloadManager,
     lock_file::{DEFAULT_LOCKFILE_NAME, LockFile},
@@ -67,13 +67,15 @@ impl App {
         }
 
         let output_files = if let Some(archive_type) = platform_config.archive {
-            let extracted = ArchivePack::new(
+            fs::create_dir_all(&config.target)?;
+            let mut extractor = ArchivePackBuilder::build(
                 archive_type,
                 downloaded_path.clone(),
                 platform_config.root.clone(),
-            )
-            .extract(&config.target)
-            .with_context(|| format!("failed to extract {}", downloaded_path.display()))?;
+            )?;
+            let extracted = extractor
+                .extract(&config.target)
+                .with_context(|| format!("failed to extract {}", downloaded_path.display()))?;
             extracted
         } else {
             let target_path = &config.target;
