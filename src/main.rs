@@ -5,7 +5,7 @@ mod core;
 mod traits;
 mod types;
 
-use anyhow::Result;
+use anyhow::{Result, anyhow};
 use clap::Parser;
 
 use app::App;
@@ -41,13 +41,19 @@ fn main() -> Result<()> {
     let lock_file = LockFile::load(&cache_manager.path_for(DEFAULT_LOCKFILE_NAME))?;
     let mut app = App::new(platform, lock_file, download_manager, cache_manager);
 
-    for config in configs.into_iter() {
+    let mut failed = false;
+    for config in configs {
         let name = config.name.clone();
-        match app.process_config(config, cli.force) {
-            Ok(_) => {}
-            Err(e) => tracing::error!("Failed to process `{}`:\n{e:#}", name),
+        if let Err(e) = app.process_config(config, cli.force) {
+            failed = true;
+            tracing::error!("Failed to process `{}`:\n{e:#}", name);
         }
     }
     app.save()?;
-    return Ok(());
+
+    if failed {
+        return Err(anyhow!("one or more configs failed to process"));
+    }
+
+    Ok(())
 }

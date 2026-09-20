@@ -37,11 +37,12 @@ impl App {
 
     pub fn process_config(&mut self, config: Config, force: bool) -> Result<()> {
         let Some(platform_config) = config.platforms.get(&self.platform) else {
-            bail!(
-                "Warning: platform {} not configured for {}, skipping",
+            tracing::warn!(
+                "Platform {} not configured for `{}`, skipping",
                 self.platform,
                 config.name
             );
+            return Ok(());
         };
 
         if !force && self.lock_file.is_locked(self.platform, &config) {
