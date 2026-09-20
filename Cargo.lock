@@ -1279,7 +1279,7 @@ dependencies = [
 
 [[package]]
 name = "prebuilt-down"
-version = "0.2.3"
+version = "0.2.4"
 dependencies = [
  "anyhow",
  "clap",
