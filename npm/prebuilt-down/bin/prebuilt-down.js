@@ -25,16 +25,12 @@ const PLATFORMS = {
     x64: "@prebuilt-down/linux-x64/prebuilt-down",
     arm64: "@prebuilt-down/linux-arm64/prebuilt-down",
   },
-  "linux-musl": {
-    x64: "@prebuilt-down/linux-x64-musl/prebuilt-down",
-    arm64: "@prebuilt-down/linux-arm64-musl/prebuilt-down",
-  },
 };
 
 const binPath =
   env.MY_CLI_BINARY ??
   (platform === "linux" && isMusl()
-    ? PLATFORMS["linux-musl"]?.[arch]
+    ? undefined
     : PLATFORMS[platform]?.[arch]);
 
 if (!binPath) {

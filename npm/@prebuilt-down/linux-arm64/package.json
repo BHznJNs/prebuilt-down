@@ -1,0 +1,20 @@
+{
+  "name": "@prebuilt-down/linux-arm64",
+  "version": "0.0.0",
+  "repository": "github:BHznJNs/prebuilt-down",
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "arm64"
+  ],
+  "libc": [
+    "glibc"
+  ],
+  "files": [
+    "prebuilt-down"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

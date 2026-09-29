@@ -30,10 +30,8 @@ const PACKAGES = [
   "@prebuilt-down/win32-arm64",
   "@prebuilt-down/darwin-x64",
   "@prebuilt-down/darwin-arm64",
-  // "@prebuilt-down/linux-x64",
-  // "@prebuilt-down/linux-arm64",
-  // "@prebuilt-down/linux-x64-musl",
-  // "@prebuilt-down/linux-arm64-musl",
+  "@prebuilt-down/linux-x64",
+  "@prebuilt-down/linux-arm64",
 ];
 
 console.log(`syncing version: ${version}\n`);
