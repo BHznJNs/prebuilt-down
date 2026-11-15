@@ -27,6 +27,8 @@ pub struct PlatformEntry {
 #[derive(Debug, Deserialize)]
 pub struct PrebuiltConfig {
     pub target: PathBuf,
+    #[serde(default)]
+    pub authorization_headers: HashMap<String, String>,
     #[serde(flatten)]
     pub platforms: HashMap<Platform, PlatformEntry>,
 }
@@ -37,6 +39,7 @@ pub type ConfigMap = HashMap<String, PrebuiltConfig>;
 pub struct Config {
     pub name: String,
     pub target: PathBuf,
+    pub authorization_headers: HashMap<String, String>,
     pub platforms: HashMap<Platform, PlatformEntry>,
 }
 
@@ -45,6 +48,7 @@ impl From<(String, PrebuiltConfig)> for Config {
         Config {
             name,
             target: inner.target,
+            authorization_headers: inner.authorization_headers,
             platforms: inner.platforms,
         }
     }

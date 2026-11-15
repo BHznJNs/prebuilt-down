@@ -75,6 +75,11 @@ root = "ripgrep-15.1.0-x86_64-pc-windows-msvc/"
 archive = "zip"
 ```
 
+## Documentation
+
+- [Features](docs/Features.md)
+- [Development](docs/Development.md)
+
 ## Links
 
 - [Dais](https://github.com/Dais-Project/Dais)

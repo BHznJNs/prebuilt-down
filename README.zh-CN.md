@@ -77,6 +77,11 @@ root = "ripgrep-15.1.0-x86_64-pc-windows-msvc/"
 archive = "zip"
 ```
 
+## 文档
+
+- [功能说明](docs/Features.zh-CN.md)
+- [开发指南](docs/Development.md)
+
 ## 链接
 
 - [Dais](https://github.com/Dais-Project/Dais)

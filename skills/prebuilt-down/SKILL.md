@@ -23,6 +23,7 @@ prebuilt-down [OPTIONS]
 | Flag | Short | Description |
 |------|-------|-------------|
 | `--config` | `-c` | Path to config file (default: `prebuilt-down.toml`) |
+| `--env-file` | | Read variables from this file instead of `.env` in the current working directory; file values override process environment variables |
 | `--platform` | `-p` | Target platform; if omitted, auto-detected from OS/arch |
 | `--verbose` | `-v` | Increase log verbosity (repeatable: `-v`, `-vv`, `-vvv`) |
 | `--force` | `-f` | Skip lock-file check, force re-download and re-extract |
@@ -36,6 +37,7 @@ The config file is TOML. Each top-level section defines one binary dependency.
 ```toml
 [binary-name]
 target = "path/to/extract/"        # directory where files land after extraction
+authorization_headers = { Authorization = "Bearer ${GITHUB_TOKEN}" }  # optional, applies to this binary on all platforms
 
 [binary-name.<platform>]
 url = "https://..."                # download URL
@@ -81,13 +83,54 @@ algorithm = "sha256"
 digest = "bb1518746cab560370fb402c3fe17ddd527141a2a341043d5e7db5d39b98d4be"
 ```
 
+### Download Authorization
+
+Configure `authorization_headers` on the binary entry, alongside `target`. It is a map of HTTP header names to string values, shared by that binary's platform downloads. Each binary can use different headers; omitted headers default to an empty map.
+
+Both TOML forms are equivalent. Add platform entries such as `[node.windows-x64]` as usual:
+
+```toml
+[node]
+target = "bin/node/"
+
+[node.authorization_headers]
+Authorization = "Bearer ${GITHUB_TOKEN}"
+```
+
+```toml
+[node]
+target = "bin/node/"
+authorization_headers = { Authorization = "Bearer ${GITHUB_TOKEN}" }
+```
+
+Use `=` between keys and values in inline TOML tables. Header values support `${VARIABLE}`, `$VARIABLE`, and `${VARIABLE:default}` placeholders; variable substitution is supported in header values, not in URLs or paths. An unset variable without a default causes that download item to fail before sending the HTTP request. Resolved variable values are not recursively expanded.
+
+Escape literal dollar signs as `\$`. In double-quoted TOML strings, write `\\$`; single-quoted TOML strings preserve the backslash, for example `Authorization = 'Bearer literal-\$token'`. Variable names use ASCII letters, digits, and underscores. See the [template syntax](https://docs.rs/subst/0.3.8/subst/struct.Template.html) for details.
+
+Variable sources follow these rules:
+
+- Without `--env-file`, read only `.env` in the current working directory; parent directories and the config file's directory are not searched.
+- With `--env-file PATH`, read only that file, without loading the default `.env`. Relative paths resolve from the current working directory.
+- If the selected file does not exist, log one warning and continue using the process environment, without falling back to another dotenv file. Other read or parse errors still fail.
+- Values from the selected file override process environment variables with the same name. Variables absent from the file fall back to the process environment.
+
+For example, put the token in `.env` or `secrets/download.env`:
+
+```dotenv
+GITHUB_TOKEN=your-token
+```
+
+```sh
+prebuilt-down --env-file secrets/download.env
+```
+
 ## How It Works (Internal Pipeline)
 
 For each binary defined in the config, prebuilt-down executes this pipeline:
 
 1. **Load config** → read and parse the TOML file.
 2. **Lock check** → if the URL, hash, and `target` directory contents match the lock file, skip.
-3. **Download** → fetch the file into `.prebuilt-down/` cache directory.
+3. **Download** → resolve this binary's authorization header variables and fetch the file with those headers into `.prebuilt-down/` cache directory.
 4. **Hash verify** → if `hash` is configured, compute the digest and compare (skips on mismatch).
 5. **Extract / Copy** → if `archive` is set, strip the `root` prefix and extract into `target`; otherwise copy the file directly into `target`.
 6. **Record lock** → write an entry into `.prebuilt-down/prebuilt-down.lock` (JSON).
@@ -98,6 +141,7 @@ For each binary defined in the config, prebuilt-down executes this pipeline:
 - Lock file: `.prebuilt-down/prebuilt-down.lock` (JSON)
 - The lock file records the URL, hash digest, and extracted file list per platform for each binary. This prevents redundant downloads when nothing changed.
 - Use `--force` to bypass the lock check.
+- Authorization headers and resolved tokens are not stored in the lock file. Changing credentials alone does not invalidate the lock; use `--force` when you need to retry a download with updated credentials.
 
 ## Examples
 
@@ -163,6 +207,10 @@ url = "https://github.com/example/my-tool/releases/download/v1.0.0/my-tool-windo
 When no `archive` is specified, the downloaded file is copied as-is into `target`.
 
 ## Troubleshooting
+
+### Authentication failures (401/403 or missing variables)
+
+Check that `authorization_headers` is configured on the binary entry and that the token is valid and authorized for the download URL. Check the selected dotenv file for values overriding the process environment. If an error reports a missing variable, define it in the process environment or the selected file. A missing env file produces a warning and uses the process environment; correct the path if you intended to load values from a file. Use `--force` if the lock check skips the download you want to retry.
 
 ### "platform X not configured for Y, skipping"
 

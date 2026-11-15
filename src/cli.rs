@@ -9,6 +9,8 @@ use crate::types::platform::Platform;
 pub struct Cli {
     #[arg(short, long, default_value = "prebuilt-down.toml")]
     pub config: PathBuf,
+    #[arg(short, long, value_name = "PATH")]
+    pub env_file: Option<PathBuf>,
     #[arg(short, long)]
     pub platform: Option<Platform>,
     #[arg(short, long, action = ArgAction::Count)]

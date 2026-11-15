@@ -11,6 +11,7 @@ use crate::core::{
     lock_file::{DEFAULT_LOCKFILE_NAME, LockFile},
     verify,
 };
+use crate::environment::Environment;
 use crate::types::platform::Platform;
 
 pub struct App {
@@ -18,6 +19,7 @@ pub struct App {
     lock_file: LockFile,
     download_manager: Arc<DownloadManager>,
     cache_manager: Arc<CacheManager>,
+    environment: Environment,
 }
 
 impl App {
@@ -26,12 +28,14 @@ impl App {
         lock_file: LockFile,
         download_manager: Arc<DownloadManager>,
         cache_manager: Arc<CacheManager>,
+        environment: Environment,
     ) -> Self {
         Self {
             platform,
             lock_file,
             download_manager,
             cache_manager,
+            environment,
         }
     }
 
@@ -50,9 +54,14 @@ impl App {
             return Ok(());
         }
 
+        let headers = DownloadManager::resolve_authorization_headers(
+            &config.authorization_headers,
+            |value| self.environment.resolve(value),
+        )
+        .with_context(|| format!("Failed to prepare download for {}, skipping", config.name))?;
         let downloaded_path = self
             .download_manager
-            .download(&platform_config.url, &config.name)
+            .download(&platform_config.url, &config.name, headers)
             .with_context(|| format!("Failed to download {}, skipping", config.name))?;
 
         if let Some(ref hash_config) = platform_config.hash {

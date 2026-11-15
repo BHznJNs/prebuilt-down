@@ -2,6 +2,7 @@ mod app;
 mod cli;
 mod config;
 mod core;
+mod environment;
 mod traits;
 mod types;
 
@@ -10,6 +11,7 @@ use clap::Parser;
 
 use app::App;
 use cli::Cli;
+use environment::Environment;
 use types::platform::Platform;
 
 use crate::core::{
@@ -35,11 +37,18 @@ fn main() -> Result<()> {
 
     let platform = cli.platform.unwrap_or_else(Platform::current);
     let configs = config::load_configs(&cli.config)?;
+    let environment = Environment::load(cli.env_file.as_deref())?;
 
     let cache_manager = CacheManager::init(None)?;
     let download_manager = DownloadManager::init(cache_manager.clone())?;
     let lock_file = LockFile::load(&cache_manager.path_for(DEFAULT_LOCKFILE_NAME))?;
-    let mut app = App::new(platform, lock_file, download_manager, cache_manager);
+    let mut app = App::new(
+        platform,
+        lock_file,
+        download_manager,
+        cache_manager,
+        environment,
+    );
 
     let mut failed = false;
     for config in configs {
