@@ -32,6 +32,8 @@ target = "bin/node/"
 Authorization = "Bearer ${GITHUB_TOKEN}"
 ```
 
+下载请求默认发送 `User-Agent: prebuilt-down/<版本号>`。在下载项的 `authorization_headers` 中设置 `User-Agent`，即可覆盖该项的默认值。
+
 也可以使用等价的 TOML 行内表，键值之间使用 `=`：
 
 ```toml

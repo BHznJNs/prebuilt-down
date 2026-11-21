@@ -32,6 +32,8 @@ target = "bin/node/"
 Authorization = "Bearer ${GITHUB_TOKEN}"
 ```
 
+Downloads send `User-Agent: prebuilt-down/<version>` by default. Set `User-Agent` in an item's `authorization_headers` to override the value for that item.
+
 The equivalent inline TOML table uses `=` between keys and values:
 
 ```toml
